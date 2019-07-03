@@ -1,0 +1,45 @@
+---
+- name: Deploy (host)
+  hosts: "{{ deploy_group }}"
+  become: yes
+  become_method: sudo
+  tasks:
+
+  - name: Find free port for public interface
+    import_role:
+      name: levonet.ci_get_free_port
+    vars:
+      ci_get_free_port__var: project_api_public_port
+      ci_get_free_port__pool: "{{ project_api_port_pool }}"
+      ci_get_free_port__host: "{{ project_host }}"
+
+  - name: Copy nginx config
+    copy:
+      dest: /etc/nginx/sites-available/10-{{ project_api_name }}.conf
+      content: "{{ project_api_nginx_conf }}"
+
+  - name: Enable nginx config
+    file:
+      src: /etc/nginx/sites-available/10-{{ project_api_name }}.conf
+      dest: /etc/nginx/sites-enabled/10-{{ project_api_name }}.conf
+      state: link
+
+  - name: Test nginx config
+    command: docker exec -t nginx nginx -t
+
+  - name: Restart nginx
+    command: docker exec -t nginx nginx -s reload
+
+  - name: Run container
+    docker_container:
+      name: "{{ project_api_name }}"
+      image: levonet/cp-measurement:latest
+      pull: yes
+      restart_policy: always
+      ports:
+      - "{{ project_host }}:{{ project_api_public_port }}:8080"
+      volumes: "{{ project_api_volumes }}"
+      log_driver: syslog
+      log_options:
+        syslog-facility: local0
+        tag: "{{ project_api_name }}"

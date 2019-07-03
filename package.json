@@ -1,0 +1,39 @@
+{
+  "name": "cp-measurement",
+  "version": "0.0.1",
+  "description": "Checkpromise measurement",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "$(npm bin)/nodemon -e js,json,yaml --ignore db/ --ignore test/ index.js",
+    "install-roles": "ansible-galaxy install -r playbook/requirements.yml --roles-path playbook/roles",
+    "docker-build": "docker build -t levonet/cp-measurement:latest .",
+    "docker-push": "docker push levonet/cp-measurement:latest",
+    "deploy-ansible": "cd playbook; ansible-playbook deploy-host.yml -e deploy_group=all -i ${INVENTORY_HOSTNAME},",
+    "deploy": "npm run docker-build; npm run docker-push; npm run install-roles; npm run deploy-ansible",
+    "lint": "$(npm bin)/eslint .",
+    "test": "npm run lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prosvita/cp-measurement.git"
+  },
+  "author": "Pavlo Bashynskyi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/prosvita/cp-measurement/issues"
+  },
+  "homepage": "https://github.com/prosvita/cp-measurement#readme",
+  "dependencies": {
+    "koa": "^2.7.0",
+    "koa-bodyparser": "^4.2.1",
+    "koa-router": "^7.4.0",
+    "lodash-id": "^0.14.0",
+    "loglevel": "^1.6.3",
+    "lowdb": "^1.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.0.1",
+    "nodemon": "^1.19.1"
+  }
+}
