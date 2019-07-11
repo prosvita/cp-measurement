@@ -9,7 +9,7 @@
     "install-roles": "ansible-galaxy install -r playbook/requirements.yml --roles-path playbook/roles",
     "docker-build": "docker build -t levonet/cp-measurement:latest .",
     "docker-push": "docker push levonet/cp-measurement:latest",
-    "deploy-ansible": "cd playbook; ansible-playbook deploy-host.yml -e deploy_group=all -i ${INVENTORY_HOSTNAME},",
+    "deploy-ansible": "cd playbook; ansible-playbook deploy-host.yml -e deploy_group=all -e project_api_hostname=${STAT_API_HOST} -e project_grafana_hostname=${STAT_HOST} -e project_grafana_password=${STAT_SECRET} -i ${INVENTORY_HOSTNAME},",
     "deploy": "npm run docker-build; npm run docker-push; npm run install-roles; npm run deploy-ansible",
     "lint": "$(npm bin)/eslint .",
     "test": "npm run lint"

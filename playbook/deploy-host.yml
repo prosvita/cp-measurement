@@ -3,7 +3,7 @@
   hosts: "{{ deploy_group }}"
   become: yes
   become_method: sudo
-  tasks:
+  pre_tasks:
 
   - name: Find free port for public interface
     import_role:
@@ -43,3 +43,73 @@
       log_options:
         syslog-facility: local0
         tag: "{{ project_api_name }}"
+
+  roles:
+
+  - role: levonet.docker_project_deploy
+    project_name: "{{ project_grafana_name }}"
+    project_hostname: "{{ project_grafana_hostname }}"
+    project_port_pool: 4101-4149
+    project_app_port: 3000
+    # nginx_include_ssl: true
+    # nginx_only_ssl: true
+    nginx_server_conf: |
+      access_log off;
+      large_client_header_buffers 4 16k;
+    nginx_test_command: docker exec -t nginx nginx -t
+    nginx_reload_command: docker exec -t nginx nginx -s reload
+    nginx_logs: no
+    docker_project_name: "{{ project_grafana_name }}"
+    docker_project_image: "{{ project_grafana_image }}"
+    docker_project_directory_owner: 472
+    docker_project_directory_group: 472
+    docker_project_directory_volumes:
+    - "{{ docker_project_home }}/conf:/etc/grafana"
+    - "{{ docker_project_home }}/storage:/var/lib/grafana"
+    docker_project_env:
+      GF_INSTALL_PLUGINS: grafana-simple-json-datasource
+    docker_project_restart: yes
+    docker_project_remove_existing_container: no
+    project_configs:
+    - dest: "{{ docker_project_home }}/conf/grafana.ini"
+      content: |
+        [paths]
+        [server]
+        root_url = https://{{ project_grafana_hostname }}
+        [database]
+        [session]
+        [dataproxy]
+        [analytics]
+        [security]
+        admin_password = {{ project_grafana_password }}
+        [snapshots]
+        [dashboards]
+        [users]
+        [auth]
+        [auth.anonymous]
+        [auth.github]
+        [auth.google]
+        [auth.generic_oauth]
+        [auth.grafana_com]
+        [auth.proxy]
+        [auth.basic]
+        [auth.ldap]
+        [smtp]
+        [emails]
+        [log]
+        mode = console
+        [log.console]
+        [log.file]
+        [log.syslog]
+        [alerting]
+        [explore]
+        [metrics]
+        [metrics.graphite]
+        [tracing.jaeger]
+        [grafana_com]
+        [external_image_storage]
+        [external_image_storage.s3]
+        [external_image_storage.webdav]
+        [external_image_storage.gcs]
+        [external_image_storage.azure_blob]
+        [external_image_storage.local]

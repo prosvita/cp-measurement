@@ -1,5 +1,8 @@
 ---
 project_host: "{{ hostvars[inventory_hostname].ansible_default_ipv4.address }}"
+
+### api
+
 project_api_name: cp-measurement
 project_api_hostname: localhost
 project_api_public_port: 4150
@@ -9,9 +12,17 @@ project_api_volumes:
 - /opt/cp-viber-bot/db/session.json:/app/db/viber-session.json
 project_api_nginx_conf: |
   server {
-      include include/listen_ssl;
+      include include/listen;
+      # include include/listen_ssl;
       server_name {{ project_api_hostname }};
       location / {
           proxy_pass http://{{ project_host }}:{{ project_api_public_port }};
       }
   }
+
+### grafana
+
+project_grafana_name: cp-grafana
+project_grafana_image: grafana/grafana:6.2.5
+project_grafana_hostname: localhost
+project_grafana_password:

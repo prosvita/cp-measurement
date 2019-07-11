@@ -1,2 +1,4 @@
 - src: levonet.ci_get_free_port
   version: v0.0.2
+- src: levonet.docker_project_deploy
+  version: "v0.8.0"
