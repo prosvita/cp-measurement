@@ -3,6 +3,8 @@ project_host: "{{ hostvars[inventory_hostname].ansible_default_ipv4.address }}"
 
 ### api
 
+project_api_version: latest
+project_api_image: levonet/cp-measurement:{{ project_api_version }}
 project_api_name: cp-measurement
 project_api_hostname: localhost
 project_api_public_port: 4150
@@ -23,6 +25,6 @@ project_api_nginx_conf: |
 ### grafana
 
 project_grafana_name: cp-grafana
-project_grafana_image: grafana/grafana:6.2.5
+project_grafana_image: grafana/grafana:6.4.3
 project_grafana_hostname: localhost
 project_grafana_password:
