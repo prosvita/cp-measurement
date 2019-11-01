@@ -33,7 +33,7 @@
   - name: Run container
     docker_container:
       name: "{{ project_api_name }}"
-      image: levonet/cp-measurement:latest
+      image: "{{ project_api_image }}"
       pull: yes
       restart_policy: always
       ports:
